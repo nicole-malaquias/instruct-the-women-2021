@@ -10,6 +10,7 @@ import requests
 def version_exists(package_name, version):
     # TODO
     # Fazer requisição na API do PyPI para checar se a versão existe
+    #aqui tem uma linha nova 
     return False
 
 
