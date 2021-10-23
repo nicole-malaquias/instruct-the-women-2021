@@ -27,7 +27,6 @@ def latest_version(package_name):
 
     response = json.loads(request.content)
     last_version = response['info']['version']
-
-    latest_version  = list(releases.keys())[-1]
     
-    return latest_version
+    
+    return last_version
