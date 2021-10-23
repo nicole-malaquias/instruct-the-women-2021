@@ -49,7 +49,7 @@ class PackageSerializer(serializers.ModelSerializer):
                 
                 return response
         except: 
-            return serializers.ValidationError("Essa lib nao existe")
+            return serializers.ValidationError( {"error": "One or more packages doesn't exist"})
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -63,12 +63,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         
         lib_name = validated_data["packages"][0]['name']
         lib_version = validated_data["packages"][0]['version']
-       
 
         projeto = Project.objects.create(name=validated_data["name"])
      
         package = PackageRelease.objects.create(name=lib_name,version=lib_version,project=projeto)
-     
-        print(projeto)
-   
+        
         return validated_data
