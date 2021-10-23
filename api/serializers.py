@@ -20,8 +20,9 @@ class PackageSerializer(serializers.ModelSerializer):
             name = [{name[0]:name[1]} for name in new_data if name[0] == 'name'][0]
             
             version = [{version[0]:version[1]} for version in new_data if version[0] == 'version'][0]
-
+            
             name_tech = name['name']
+            is_existe = version_exists(name_tech, version['version'])
 
             request = requests.get(f'https://pypi.org/pypi/{name_tech}/json')
 

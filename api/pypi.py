@@ -8,9 +8,13 @@ import requests
 # https://docs.python-requests.org/en/master/user/quickstart/#json-response-content
 
 def version_exists(package_name, version):
-    # TODO
-    # Fazer requisição na API do PyPI para checar se a versão existe
-    #aqui tem uma linha nova 
+    
+    request = requests.get(f'https://pypi.org/pypi/{name_tech}/json')
+    response = json.loads(request.content)
+
+    if  version['version'] in response['releases']:
+        return True
+
     return False
 
 
