@@ -60,16 +60,15 @@ class ProjectSerializer(serializers.ModelSerializer):
     packages = PackageSerializer(many=True)
 
     def create(self, validated_data):
-        # TODO
         
-        lib = PackageRelease( validated_data["packages"])
-        projeto = Project(validated_data['name'])
+        lib_name = validated_data["packages"][0]['name']
+        lib_version = validated_data["packages"][0]['version']
+       
 
-        
-        # Salvar o projeto e seus pacotes associados.
-        #
-        # Algumas referência para uso de models do Django:
-        # - https://docs.djangoproject.com/en/3.2/topics/db/models/
-        # - https://www.django-rest-framework.org/api-guide/serializers/#saving-instances
-        packages = validated_data["packages"]
-        return Project(name=validated_data["name"])
+        projeto = Project.objects.create(name=validated_data["name"])
+     
+        package = PackageRelease.objects.create(name=lib_name,version=lib_version,project=projeto)
+     
+        print(projeto)
+   
+        return validated_data
