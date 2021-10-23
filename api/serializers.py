@@ -3,7 +3,7 @@ import json
 import requests
 from .models import PackageRelease, Project
 from .pypi import version_exists, latest_version
-
+from collections import OrderedDict
 
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,49 +14,42 @@ class PackageSerializer(serializers.ModelSerializer):
     def validate(self,data ):
 
         new_data = data.items()
-      
-        if (len(new_data)) > 1 : 
-          
-            name = [{name[0]:name[1]} for name in new_data if name[0] == 'name'][0]
+        try :
+            if (len(new_data)) > 1 : 
             
-            version = [{version[0]:version[1]} for version in new_data if version[0] == 'version'][0]
-            
-            name_tech = name['name']
-            is_existe = version_exists(name_tech, version['version'])
+                name = [{name[0]:name[1]} for name in new_data if name[0] == 'name'][0]
+                version = [{version[0]:version[1]} for version in new_data if version[0] == 'version'][0]['version']
+                
+                name_tech = name['name']
+                is_existe = version_exists(name_tech, version)
 
-            request = requests.get(f'https://pypi.org/pypi/{name_tech}/json')
+                if not is_existe:
+                    raise serializers.ValidationError()
 
-            if request.status_code == 404 :
-                raise serializers.ValidationError()
+                request = requests.get(f'https://pypi.org/pypi/{name_tech}/json')
+                response = json.loads(request.content)
 
-            response = json.loads(request.content)
+                if  version in response['releases']:
+                    return data
 
-            if  version['version'] in response['releases']:
-                return data
+                else :
+                    raise serializers.ValidationError()
 
             else :
-                raise serializers.ValidationError()
 
-        else :
+                name = [{name[0]:name[1]} for name in new_data if name[0] == 'name'][0]
+                    
+                name_tech = name['name']
 
-            name = [{name[0]:name[1]} for name in new_data if name[0] == 'name'][0]
+                last_version = latest_version(name_tech)
+
+                response = OrderedDict()
+                response['name'] = name['name']
+                response['version'] =  last_version
                 
-            name_tech = name['name']
-
-            request = requests.get(f'https://pypi.org/pypi/{name_tech}/json')
-        
-            response = json.loads(request.content)
-
-            last_version = response['info']['version']
-
-            from collections import OrderedDict
-
-            response = OrderedDict()
-            response['name'] = name['name']
-            response['version'] =  last_version
-              
-            return response
-
+                return response
+        except: 
+            return serializers.ValidationError("Essa lib nao existe")
 
 
 class ProjectSerializer(serializers.ModelSerializer):
