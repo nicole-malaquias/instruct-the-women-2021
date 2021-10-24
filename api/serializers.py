@@ -35,12 +35,15 @@ class PackageSerializer(serializers.ModelSerializer):
                 return response
 
             version = arr[1]['version']
+            version = version.strip()
             
-            is_exists = version_exists(name_tech,version)
+            import re
+            pattern_version = re.sub(r"[^a-zA-Z0-9]",".",version)
+            is_exists = version_exists(name_tech,pattern_version)
         
             if is_exists == True:
 
-                response = {"name":name_tech, "version":version}
+                response = {"name":name_tech, "version":pattern_version}
                 return response
 
         except:
