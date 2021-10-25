@@ -15,39 +15,38 @@ class PackageSerializer(serializers.ModelSerializer):
 
     def validate(self,data):
 
-        try:
-            new_data = data.items()
-
-            arr = [{item[0]:item[1]}for item in new_data]
-
-            name_tech = arr[0]['name']
-            
-            if len(arr) == 1 :
-            
-                last = latest_version(name_tech)
-                
-                if  last == None :
-                    
-                    raise serializers.ValidationError({"error": "One or more packages doesn't exist"})
-
-                response = {"name":name_tech, "version":last}
-            
-                return response
-
-            version = arr[1]['version']
-            version = version.strip()
-            
-            import re
-            pattern_version = re.sub(r"[^a-zA-Z0-9]",".",version)
-            is_exists = version_exists(name_tech,pattern_version)
         
-            if is_exists == True:
+        new_data = data.items()
 
-                response = {"name":name_tech, "version":pattern_version}
-                return response
+        arr = [{item[0]:item[1]}for item in new_data]
 
-        except:
-            raise serializers.ValidationError({"error": "One or more packages doesn't exist"})
+        name_tech = arr[0]['name']
+        
+        if len(arr) == 1 :
+        
+            last = latest_version(name_tech)
+            
+            if  last == None :
+                
+                raise serializers.ValidationError({"error": "One or more packages doesn't exist"})
+
+            response = {"name":name_tech, "version":last}
+        
+            return response
+
+        version = arr[1]['version']
+        version = version.strip()
+        
+        import re
+        pattern_version = re.sub(r"[^a-zA-Z0-9]",".",version)
+        is_exists = version_exists(name_tech,pattern_version)
+      
+        if is_exists == True:
+            response = {"name":name_tech, "version":pattern_version}
+            return response
+
+        raise serializers.ValidationError({"error": "One or more packages doesn't exist"})
+       
         
      
 

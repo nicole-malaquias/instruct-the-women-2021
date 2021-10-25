@@ -10,13 +10,13 @@ import json
 
 def version_exists(package_name, version):
     
-    request = requests.get(f'https://pypi.org/pypi/{package_name}/json')
-    response = json.loads(request.content)
+    request = requests.get(f'https://pypi.org/pypi/{package_name}/{version}/json')
+  
+    if request.status_code == 404 :
+        return False
+        
+    return True
 
-    if  version in response['releases']:
-        return True
-
-    return False
 
 
 def latest_version(package_name):
