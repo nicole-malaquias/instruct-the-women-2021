@@ -35,14 +35,11 @@ class PackageSerializer(serializers.ModelSerializer):
             return response
 
         version = arr[1]['version']
-        version = version.strip()
-        
-        import re
-        pattern_version = re.sub(r"[^a-zA-Z0-9]",".",version)
-        is_exists = version_exists(name_tech,pattern_version)
+       
+        is_exists = version_exists(name_tech,version)
       
         if is_exists == True:
-            response = {"name":name_tech, "version":pattern_version}
+            response = {"name":name_tech, "version":version}
             return response
 
         raise serializers.ValidationError({"error": "One or more packages doesn't exist"})
