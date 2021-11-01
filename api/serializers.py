@@ -55,14 +55,29 @@ class ProjectSerializer(serializers.ModelSerializer):
     packages = PackageSerializer(many=True)
 
     def create(self, validated_data):
-      
-        lib_name = validated_data["packages"][0]['name']
-        lib_version = validated_data["packages"][0]['version']
-        
+
+        arr_packages = []
+
+        for item in validated_data['packages'] :
+
+            is_exist = False
+
+            for i in arr_packages :
+
+                if i['name'] == item['name'] :
+                    is_exist = True
+            
+            if not is_exist :
+                arr_packages.append(item)
+
         projeto = Project.objects.create(name=validated_data["name"])
 
-        for lib in validated_data["packages"] :
-            package = PackageRelease.objects.create(name=lib['name'],version=lib['version'],project=projeto)
-    
+        for lib in arr_packages :
+        
+            PackageRelease.objects.create(name=lib['name'],version=lib['version'],project=projeto)
+
+        del validated_data['packages']
+        validated_data['packages'] = arr_packages
+
         return validated_data
 
